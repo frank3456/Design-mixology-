@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="PaletteCraft - The Color & Design Playground"/>
+    <title>PaletteCraft: The Color & Design Playground</title>
+    <link rel="stylesheet" href="styles.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        .palette-color {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .palette-color:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+        .palette-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .hidden { display: none; }
+        .cta-button { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section id="hero" class="section hero">
+        <h1>PaletteCraft</h1>
+        <p>Mix, test, and craft stunning palettes for your next project effortlessly.</p>
+        <button id="start-mixing" class="cta-button">Start Mixing</button>
+    </section>
+
+    <!-- Palette Mixer -->
+    <section id="mixer" class="section hidden">
+        <h2>Build Your Color Cocktail</h2>
+        <div class="palette-options">
+            <div class="option-group">
+                <h3>Color Vibes</h3>
+                <button class="option" data-type="vibe" data-value="vibrant">Vibrant</button>
+                <button class="option" data-type="vibe" data-value="pastel">Pastel</button>
+                <button class="option" data-type="vibe" data-value="dark">Dark</button>
+                <button class="option" data-type="vibe" data-value="muted">Muted</button>
+            </div>
+            <div class="option-group">
+                <h3>Accent Style</h3>
+                <button class="option" data-type="accent" data-value="neon">Neon</button>
+                <button class="option" data-type="accent" data-value="warm">Warm</button>
+                <button class="option" data-type="accent" data-value="cool">Cool</button>
+            </div>
+            <button id="mix-palette" class="cta-button">Mix Palette</button>
+            <button id="random-palette" class="cta-button">Surprise Me</button>
+        </div>
+        <div id="palette-container" class="palette-container"></div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section hidden">
+        <h2>About PaletteCraft</h2>
+        <p>PaletteCraft was crafted to help designers, developers, and hobbyists generate beautiful color combinations seamlessly. Inspired by design mixology, it makes color exploration fun and productive.</p>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section hidden">
+        <h2>Contact</h2>
+        <form id="contact-form">
+            <input type="text" id="name" placeholder="Your Name" required/>
+            <input type="email" id="email" placeholder="Your Email" required/>
+            <textarea id="message" placeholder="Your Message" required></textarea>
+            <button type="submit" class="cta-button">Send Message</button>
+        </form>
+        <div id="form-feedback"></div>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="#hero">Home</a>
+        <a href="#mixer">Mixer</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <script>
+        // Palette arrays
+        const palettes = [
+            ["#264653", "#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"],
+            ["#0f172a", "#2563eb", "#10b981", "#facc15", "#f97316"],
+            ["#1e293b", "#334155", "#64748b", "#cbd5e1", "#f8fafc"],
+            ["#3b82f6", "#9333ea", "#f43f5e", "#22c55e", "#f59e0b"],
+            ["#ff6b6b", "#feca57", "#48dbfb", "#1dd1a1", "#5f27cd"]
+        ];
+
+        function getBalancedPalette() {
+            return palettes[Math.floor(Math.random() * palettes.length)];
+        }
+
+        function launchConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav a').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
+                document.querySelector(link.getAttribute('href')).classList.remove('hidden');
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Start Mixing Button
+        document.getElementById('start-mixing').addEventListener('click', () => {
+            document.getElementById('hero').classList.add('hidden');
+            document.getElementById('mixer').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        });
+
+        // Mix & Random Palette Buttons
+        function displayPalette(colors) {
+            const paletteContainer = document.getElementById('palette-container');
+            paletteContainer.innerHTML = '';
+            colors.forEach(color => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'palette-color';
+                colorDiv.style.backgroundColor = color;
+                colorDiv.title = color;
+                colorDiv.textContent = color;
+                colorDiv.addEventListener('click', () => {
+                    navigator.clipboard.writeText(color).then(() => {
+                        alert(`${color} copied to clipboard!`);
+                    });
+                });
+                paletteContainer.appendChild(colorDiv);
+            });
+            launchConfetti();
+        }
+
+        document.getElementById('mix-palette').addEventListener('click', () => {
+            const colors = getBalancedPalette();
+            displayPalette(colors);
+        });
+
+        document.getElementById('random-palette').addEventListener('click', () => {
+            const colors = getBalancedPalette();
+            displayPalette(colors);
+        });
+
+        // Contact Form
+        document.getElementById('contact-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const feedback = document.getElementById('form-feedback');
+
+            if (!name || !email || !message) {
+                feedback.textContent = 'Please fill in all fields.';
+                feedback.style.color = 'red';
+                return;
+            }
+
+            const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+            if (!emailRegex.test(email)) {
+                feedback.textContent = 'Please enter a valid email address.';
+                feedback.style.color = 'red';
+                return;
+            }
+
+            feedback.textContent = 'Message sent successfully!';
+            feedback.style.color = 'green';
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>
